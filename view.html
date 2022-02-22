@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!-- saved from url=(0202)https://s3-ap-northeast-1.amazonaws.com/sktn3view/view/view2.html#https://script.google.com/macros/s/AKfycbzc2kbAWf_dj66KAOGOKG78IolgUhRPHigYorsMXlC0vsoC5aG5bQGs0g/exec?callback=show&me=sktn&sh=sktnHOME -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>view</title> 
+
+<meta http-equiv="x-ua-compatible" content="IE=10"> 
+
+<script type="text/javascript">
+<!--
+
+
+  //表示するURLリストのデフォルト値
+  //var urlList = "urls.js";
+  var urlList = "";
+
+  //#で別のJSONPを指定可能
+  if( window.location.hash != "" && window.location.hash != "#" ){
+    urlList = window.location.hash.substring(1);
+  }
+
+  if(urlList == ""){
+    alert("URLのリストを指定してください");
+  }
+ 
+
+   
+
+//*****************************************************
+//** Grobal Variable
+//*****************************************************
+  //JSONPのshow関数読み出しに失敗した場合、再チャレンジする
+  var LoadInterval;
+
+
+//*****************************************************
+//** SHOW & LOAD XML Files
+//*****************************************************
+  //URLリストを取得
+  function load(){
+
+    console.log("Call load()");
+
+    //ページを離れる直前にメッセージを表示する
+    window.onbeforeunload = function(e){
+      return "where do i go to ?";
+    }
+   
+    //ページを離れた時に新規ウィンドウを開く
+ /*
+    window.onunload = function(){
+    }
+ */
+
+    var d_now = new Date();
+
+    try{
+      console.log("Load JSONP: " + urlList);
+      var script = document.createElement("script");
+
+      //if( urlList.test("?") ){
+      if( (new String(urlList)).match(/\?/) != null){
+        script.src = urlList + "&" + d_now.getTime();//timeはキャッシュを残さないため
+      }else{
+        script.src = urlList + "?" + d_now.getTime();//timeはキャッシュを残さないため
+      }
+
+      document.body.appendChild(script);
+
+      //JSONPでshow関数が呼ばれなかったときのために
+      //例：urls.jsの構文エラーなど
+      LoadInterval = window.setInterval(function(){load()},30000);
+    }catch(e){
+      console.log("Error in load(): " + e);
+      setTimeout(location.reload(),30000);//debug.msgを見てからリロード
+    }
+  }
+
+  //URL表示
+  function show(entrys,count){
+    console.log("call show()");
+
+    window.clearInterval(LoadInterval);
+
+    //URL表示
+    if(entrys.length!=0 && count < entrys.length){//指定されたURL数
+
+      var skip = false;
+
+      var d_now = new Date();
+      //endで指定しされた日時を超えていたら掲載しない
+      try{
+        if(entrys[count]["end"] != ""){
+          var d_end = new Date(entrys[count]["end"]);
+          if( d_now > d_end ) { 
+            skip = true; 
+            console.log("skip  end time : " + entrys[count]["url"] + "　～" + entrys[count]["end"]);
+          }
+        }
+      }catch(e){
+        console.log("Error in show() check end date : " + e);
+      }
+      //startで指定しされた日時を超えていなければ掲載しない
+      try{
+        if(entrys[count]["start"] != ""){
+          var d_start = new Date(entrys[count]["start"]);
+          if( d_now < d_start ) { 
+            skip = true; 
+            console.log("skip  start time : " + entrys[count]["url"] + "　" + entrys[count]["start"] + "～");
+          }
+        }
+      }catch(e){
+        console.log("Error in show() check start date : " + e);
+      }
+
+      //ＵＲＬ指定
+      if (skip==false){
+        try{
+          (document.getElementById('fs')).setAttribute('src',entrys[count]["url"]);
+          console.log("show url: " + entrys[count]["url"] + ", cnt:" +count);
+        }catch(e){
+          console.log("Error in show() set src: " + e);
+          setTimeout(location.reload(),60000);//debug.msgを見てからリロード
+        }
+      }
+
+      count++;
+      if(skip == false){
+        console.log("show interval: " + entrys[count-1]["interval"] + "sec");
+        setTimeout(function(){show(entrys,count)},entrys[count-1]["interval"]*1000);//sec → msec
+      }else{
+        show(entrys,count);
+      }
+    }else{
+      count = 0;
+      load();
+    }
+  }
+
+
+//*****************************************************
+//** Start
+//*****************************************************
+  function init(){
+    console.log("Debug Start on "+(new Date()).toLocaleString());
+    setTimeout("load()", 2000);
+  }
+//-->
+</script>
+ 
+<style type="text/css">
+<!--
+html {
+  margin: 0;
+  padding: 0;
+  height: 98%;
+  width: 99%;
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+iframe {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#container {
+  height: 100%;
+}
+-->
+</style>
+</head>
+
+<body onload="init()">
+<!-- ほげ -->
+  <div id="container">
+    <iframe id="fs" border="0" width="100%" height="100%" src="./view_files/saved_resource.html"></iframe>
+  </div>
+
+
+<script src="./view_files/exec"></script></body></html>
