@@ -139,6 +139,10 @@ function getJsonp(sheet,callbackStr){
   return callbackStr + "(" + getJsonFromListOrCash(sheet) + ", 0);"
 }
 
+function getListNum(sheet){ 
+  return sheet.getRange("I2").getValues()[0][0];
+}
+
 function checkURL(str){  
   if(str.match(/http/) == null){ return false; }
   if(str.match(/javascript/) != null){ return false; }
@@ -208,7 +212,7 @@ function getJsonFromListOrCash(sheet){
 
 function getJsonFromList(sheet){
   var json = "";
-  var urls = sheet.getRange(2,2,sheet.getMaxRows()-1,6).getValues();
+  var urls = sheet.getRange(2,2,getListNum(sheet),6).getValues();
   
   clearStatus(sheet);
   
